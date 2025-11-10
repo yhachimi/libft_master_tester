@@ -2,7 +2,7 @@
 
 A **complete, professional, and colorized test suite** for **42's libft project** —  
 created with ❤️ by **Younes Hachimi (yhachimi)**.
-
+WARNIING : for new this test works only with the manadtory and bons part we will edited soon  
 It builds your `libft.a` via its original Makefile and runs a full verification of all mandatory, bonus, and edge-case functions.
 
 ---
