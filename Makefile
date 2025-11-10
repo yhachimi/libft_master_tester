@@ -28,7 +28,8 @@ build: build-libft build-test
 # Build the parent libft using its own Makefile
 build-libft:
 	@echo "Building libft in $(LIBFT_DIR) via its Makefile..."
-	@$(MAKE) -C $(LIBFT_DIR)
+	@make  -C $(LIBFT_DIR)
+	@make bonus -C ../
 	@if [ ! -f $(LIBFT_LIB) ]; then \
 		echo "Error: $(LIBFT_LIB) not found after building $(LIBFT_DIR)"; exit 1; \
 	fi
