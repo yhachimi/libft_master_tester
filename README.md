@@ -8,7 +8,8 @@ It builds your `libft.a` via its original Makefile and runs a full verification 
 
 ## 📜 Overview
 
-WARNIING : for new this tester works only with the manadtory and bons part we will edited soon 
+WARNIING : for new this tester works only with the manadtory and bonus part we will edited soon 
+
 This tester is designed to:
 - ✅ Build your `libft.a` automatically.  
 - 🧪 Run **hundreds of assertions** across all parts (mandatory + bonus).  
