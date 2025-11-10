@@ -1,78 +1,69 @@
-# Makefile - orchestrates building the subproject libft, then builds & runs monsters_test
+# Makefile for libft_master_tester
+# Builds the parent libft (via its Makefile), then compiles and runs monsters_test.
+# Place this file in the libft_master_tester directory.
 #
-# Behavior:
-#  - "make" will run the Makefile inside the ./libft directory to produce libft/libft.a
-#  - then it will compile monsters_test.c and link against libft/libft.a
-#  - finally it will run the produced test binary
-#
-# Useful targets:
-#  make         -> build libft (via its Makefile), build the test, run the test
-#  make build   -> build only (libft + test)
-#  make run     -> run the test (after build or if binary exists)
-#  make valgrind-> run the test under valgrind (libft must be built)
-#  make asan    -> build a single ASan-instrumented test (compiles test + libft sources into one binary)
-#  make clean   -> remove test binary
-#  make fclean  -> call libft's fclean (if present) and remove test binaries
-#  make re      -> fclean + make
+# Usage:
+#   make        # build parent libft, compile test, run test
+#   make build  # build parent libft and compile test (no run)
+#   make run    # run the test binary (after build)
+#   make valgrind
+#   make asan
+#   make clean
+#   make fclean
 #
 CC ?= cc
-CFLAGS ?= -Wall -Wextra -Werror -I.
-LIBFT_DIR := libft
+CFLAGS ?= -Wall -Wextra -Werror -I..
+LIBFT_DIR := ..
 LIBFT_LIB := $(LIBFT_DIR)/libft.a
 TEST_SRC := monsters_test.c
 TEST_BIN := monsters_test
 ASAN_BIN := monsters_test_asan
 
-.PHONY: all build run build-libft build-test valgrind asan clean fclean re
+.PHONY: all build build-libft build-test run valgrind asan clean fclean re
 
-# Default: build libft via its Makefile, build test, run it
 all: build run
 
-# Build (libft via its Makefile, then the test)
 build: build-libft build-test
 
-# Run test (assumes it is built)
-run: $(TEST_BIN)
-	@echo "Running $(TEST_BIN)..."
-	./$(TEST_BIN)
-
-# Call the libft Makefile in the subdirectory to build the static library
+# Build the parent libft using its own Makefile
 build-libft:
-	@echo "Building libft via $(LIBFT_DIR)/Makefile"
+	@echo "Building libft in $(LIBFT_DIR) via its Makefile..."
 	@$(MAKE) -C $(LIBFT_DIR)
 	@if [ ! -f $(LIBFT_LIB) ]; then \
 		echo "Error: $(LIBFT_LIB) not found after building $(LIBFT_DIR)"; exit 1; \
 	fi
 
-# Compile monsters_test linking with the libft produced by the libft Makefile
+# Compile the test and link with the libft created by the parent Makefile
 build-test: $(LIBFT_LIB) $(TEST_SRC)
-	@echo "Building test $(TEST_BIN) linking with $(LIBFT_LIB)"
+	@echo "Compiling $(TEST_BIN) and linking with $(LIBFT_LIB)..."
 	$(CC) $(CFLAGS) $(TEST_SRC) $(LIBFT_LIB) -o $(TEST_BIN)
+
+# Run the test binary
+run: $(TEST_BIN)
+	@echo "Running $(TEST_BIN)..."
+	./$(TEST_BIN)
 
 # Run under Valgrind (requires valgrind installed)
 valgrind: build
 	@if ! command -v valgrind >/dev/null 2>&1; then \
 		echo "valgrind not found; install valgrind to use this target"; exit 1; \
 	fi
-	@echo "Running $(TEST_BIN) under valgrind..."
+	@echo "Running $(TEST_BIN) under Valgrind..."
 	valgrind --leak-check=full --show-leak-kinds=all ./$(TEST_BIN)
 
-# Build an ASan-instrumented binary. This compiles the libft sources + test together
-# so ASan also instruments libft code (this avoids relying on the libft sub-make).
-# NOTE: if you prefer to rebuild the libft static library with ASan flags instead,
-# we can change this to call $(MAKE) -C $(LIBFT_DIR) with CFLAGS overridden.
+# Build ASan-instrumented binary by compiling libft sources + test together,
+# so ASan also instruments libft code. This does not call the parent Makefile.
 asan:
-	@echo "Building $(ASAN_BIN) with AddressSanitizer (compiles libft sources + test into one binary)"
+	@echo "Building ASan-instrumented binary $(ASAN_BIN)..."
 	$(CC) $(CFLAGS) -fsanitize=address -g $(wildcard $(LIBFT_DIR)/*.c) $(TEST_SRC) -o $(ASAN_BIN)
 	@echo "Running $(ASAN_BIN)..."
 	./$(ASAN_BIN)
 
-# Remove only the test binaries and object files produced by this top-level Makefile
 clean:
 	@echo "Cleaning test binaries"
 	-rm -f $(TEST_BIN) $(ASAN_BIN) a.out
 
-# Attempt to call libft's fclean (if present) and remove test binaries
+# Call parent libft's fclean if available, and remove local test binaries
 fclean: clean
 	@echo "Calling fclean in $(LIBFT_DIR) (if present)"
 	-@$(MAKE) -C $(LIBFT_DIR) fclean
