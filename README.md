@@ -1,14 +1,14 @@
 # 🧠 libft_master_tester
 
 A **complete, professional, and colorized test suite** for **42's libft project** —  
-created with ❤️ by **Younes Hachimi (yhachimi)**.
-WARNIING : for new this test works only with the manadtory and bons part we will edited soon  
+created with ❤️ by **Younes Hachimi (yhachimi)**.  
 It builds your `libft.a` via its original Makefile and runs a full verification of all mandatory, bonus, and edge-case functions.
 
 ---
 
 ## 📜 Overview
 
+WARNIING : for new this tester works only with the manadtory and bons part we will edited soon 
 This tester is designed to:
 - ✅ Build your `libft.a` automatically.  
 - 🧪 Run **hundreds of assertions** across all parts (mandatory + bonus).  
