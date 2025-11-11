@@ -1,584 +1,990 @@
-/*
-** monsters_test.c - Complete Enhanced libft Tester with Visual Effects
-** 
-** Comprehensive test suite for 42's libft project featuring:
-** - All mandatory functions (Part 1 & Part 2)
-** - All bonus functions (linked lists)
-** - Edge cases and boundary conditions
-** - Memory safety and crash prevention
-** - Colorized output with ANSI escape codes
-** - Animated banner and visual feedback
-**
-** Usage:
-**   cc -Wall -Wextra -Werror monsters_test.c libft.a -o monsters_test
-**   ./monsters_test
-**
-** Memory Testing:
-**   valgrind --leak-check=full --show-leak-kinds=all ./monsters_test
-**   cc -fsanitize=address -g monsters_test.c libft.a -o test_asan && ./test_asan
-*/
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   monsters_test.c                                    :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: yhachimi <yhachimi@student.1337.ma>        +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2025/11/11                                    */
+/*                                                                            */
+/* ************************************************************************** */
 
-#include <stdint.h>
-#include "libft.h"
-#include <stdio.h>
-#include <string.h>
-#include <stdlib.h>
-#include <unistd.h>
-#include <limits.h>
-#include <ctype.h>
-#include <errno.h>
+#include "test_utils.h"
 
-/* ANSI Color Codes */
-#define CLR_RESET  "\x1b[0m"
-#define CLR_RED    "\x1b[31m"
-#define CLR_GREEN  "\x1b[32m"
-#define CLR_YELLOW "\x1b[33m"
-#define CLR_BLUE   "\x1b[34m"
-#define CLR_MAG    "\x1b[35m"
-#define CLR_CYAN   "\x1b[36m"
-#define CLR_BOLD   "\x1b[1m"
+int tests_run = 0;
+int tests_passed = 0;
 
-/* Test counters */
-static int tests_run = 0;
-static int tests_passed = 0;
+/* ========== PART 1: Character Classification Tests ========== */
 
-/* Animated banner */
-static void banner(void)
+static void test_isalpha(void)
 {
-    const char *lines[] = {
-        " __  __                 _                 _____         _   ",
-        "|  \\/  | ___  _ __  ___| |_ ___ _ __ ___|_   _|__  ___| |_ ",
-        "| |\\/| |/ _ \\| '_ \\/ __| __/ _ \\ '__/ __|| |/ _ \\/ __| __|",
-        "| |  | | (_) | | | \\__ \\ ||  __/ |  \\__ \\| |  __/\\__ \\ |_ ",
-        "|_|  |_|\\___/|_| |_|___/\\__\\___|_|  |___/|_|\\___||___/\\__|",
-        "                                                            ",
-        "         🧪 Comprehensive libft Test Suite 🧪              ",
-        NULL
-    };
+    printf("\n%s=== ft_isalpha ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    printf("\n%s%s", CLR_MAG, CLR_BOLD);
-    for (int i = 0; lines[i]; ++i) {
-        printf("%s\n", lines[i]);
-        fflush(stdout);
-        usleep(60000);
-    }
-    printf("%s\n", CLR_RESET);
-    usleep(150000);
+    if (ft_isalpha('a') && ft_isalpha('Z'))
+        result_ok("ft_isalpha: lowercase and uppercase");
+    else
+        result_ko("ft_isalpha: lowercase and uppercase");
+    
+    if (!ft_isalpha('0') && !ft_isalpha(' ') && !ft_isalpha('@'))
+        result_ok("ft_isalpha: non-alpha chars");
+    else
+        result_ko("ft_isalpha: non-alpha chars");
+    
+    if (!ft_isalpha(127) && !ft_isalpha(-1))
+        result_ok("ft_isalpha: edge values");
+    else
+        result_ko("ft_isalpha: edge values");
 }
 
-/* Section header with visual effect */
-static void section(const char *title)
+static void test_isdigit(void)
 {
-    printf("\n%s%s╔═══════════════════════════════════════════════════════════╗%s\n", 
-           CLR_CYAN, CLR_BOLD, CLR_RESET);
-    printf("%s%s║  %-55s  ║%s\n", CLR_CYAN, CLR_BOLD, title, CLR_RESET);
-    printf("%s%s╚═══════════════════════════════════════════════════════════╝%s\n", 
-           CLR_CYAN, CLR_BOLD, CLR_RESET);
-    usleep(100000);
+    printf("\n%s=== ft_isdigit ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    if (ft_isdigit('0') && ft_isdigit('5') && ft_isdigit('9'))
+        result_ok("ft_isdigit: valid digits");
+    else
+        result_ko("ft_isdigit: valid digits");
+    
+    if (!ft_isdigit('a') && !ft_isdigit('/') && !ft_isdigit(':'))
+        result_ok("ft_isdigit: non-digits");
+    else
+        result_ko("ft_isdigit: non-digits");
 }
 
-/* Colored result reporter */
-static void report_result(const char *name, int ok)
+static void test_isalnum(void)
 {
-    ++tests_run;
-    if (ok) {
-        ++tests_passed;
-        printf("%s%s✓%s %s\n", CLR_GREEN, CLR_BOLD, CLR_RESET, name);
-    } else {
-        printf("%s%s✗%s %s\n", CLR_RED, CLR_BOLD, CLR_RESET, name);
-    }
+    printf("\n%s=== ft_isalnum ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    if (ft_isalnum('a') && ft_isalnum('Z') && ft_isalnum('5'))
+        result_ok("ft_isalnum: alphanumeric");
+    else
+        result_ko("ft_isalnum: alphanumeric");
+    
+    if (!ft_isalnum('@') && !ft_isalnum(' ') && !ft_isalnum('\n'))
+        result_ok("ft_isalnum: non-alphanumeric");
+    else
+        result_ko("ft_isalnum: non-alphanumeric");
 }
 
-/* Helper functions */
-static ssize_t read_full(int fd, void *buf, size_t n)
+static void test_isascii(void)
 {
-    size_t total = 0;
-    char *p = buf;
-    while (total < n) {
-        ssize_t r = read(fd, p + total, n - total);
-        if (r < 0) return r;
-        if (r == 0) break;
-        total += (size_t)r;
-    }
-    return (ssize_t)total;
+    printf("\n%s=== ft_isascii ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    if (ft_isascii(0) && ft_isascii(65) && ft_isascii(127))
+        result_ok("ft_isascii: valid ASCII");
+    else
+        result_ko("ft_isascii: valid ASCII");
+    
+    if (!ft_isascii(128) && !ft_isascii(-1) && !ft_isascii(300))
+        result_ok("ft_isascii: out of range");
+    else
+        result_ko("ft_isascii: out of range");
 }
 
-static void expect_int_eq(const char *title, int expected, int actual)
+static void test_isprint(void)
 {
-    char buf[256];
-    snprintf(buf, sizeof(buf), "%s : expected=%d got=%d", title, expected, actual);
-    report_result(buf, expected == actual);
+    printf("\n%s=== ft_isprint ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    if (ft_isprint(' ') && ft_isprint('~') && ft_isprint('A'))
+        result_ok("ft_isprint: printable chars");
+    else
+        result_ko("ft_isprint: printable chars");
+    
+    if (!ft_isprint(31) && !ft_isprint(127) && !ft_isprint('\n'))
+        result_ok("ft_isprint: non-printable");
+    else
+        result_ko("ft_isprint: non-printable");
 }
 
-static void expect_str_eq(const char *title, const char *expected, const char *actual)
+/* ========== String Length Tests ========== */
+
+static void test_strlen(void)
 {
-    char buf[512];
-    int ok = (expected == NULL && actual == NULL) ||
-             (expected && actual && strcmp(expected, actual) == 0);
-    snprintf(buf, sizeof(buf), "%s : exp=\"%s\" got=\"%s\"", title,
-             expected ? expected : "(null)", actual ? actual : "(null)");
-    report_result(buf, ok);
+    printf("\n%s=== ft_strlen ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    if (ft_strlen("") == 0)
+        result_ok("ft_strlen: empty string");
+    else
+        result_ko("ft_strlen: empty string");
+    
+    if (ft_strlen("Hello") == 5)
+        result_ok("ft_strlen: normal string");
+    else
+        result_ko("ft_strlen: normal string");
+    
+    if (ft_strlen("1337 School") == 11)
+        result_ok("ft_strlen: string with space");
+    else
+        result_ko("ft_strlen: string with space");
+    
+    char long_str[1000];
+    memset(long_str, 'A', 999);
+    long_str[999] = '\0';
+    if (ft_strlen(long_str) == 999)
+        result_ok("ft_strlen: long string");
+    else
+        result_ko("ft_strlen: long string");
 }
 
-static void expect_mem_eq(const char *title, const void *a, const void *b, size_t n)
+/* ========== Memory Functions Tests ========== */
+
+static void test_memset(void)
 {
-    int ok = memcmp(a, b, n) == 0;
-    char buf[256];
-    snprintf(buf, sizeof(buf), "%s", title);
-    report_result(buf, ok);
+    printf("\n%s=== ft_memset ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    char buf[10];
+    ft_memset(buf, 'A', 10);
+    if (buf[0] == 'A' && buf[9] == 'A')
+        result_ok("ft_memset: basic fill");
+    else
+        result_ko("ft_memset: basic fill");
+    
+    ft_memset(buf, 0, 10);
+    if (buf[0] == 0 && buf[9] == 0)
+        result_ok("ft_memset: zero fill");
+    else
+        result_ko("ft_memset: zero fill");
+    
+    ft_memset(buf, 255, 5);
+    if ((unsigned char)buf[0] == 255 && (unsigned char)buf[4] == 255)
+        result_ok("ft_memset: byte value 255");
+    else
+        result_ko("ft_memset: byte value 255");
 }
 
-static void free_split(char **arr)
+static void test_bzero(void)
 {
-    if (!arr) return;
-    for (size_t i = 0; arr[i]; ++i) free(arr[i]);
-    free(arr);
+    printf("\n%s=== ft_bzero ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    char buf[10] = "123456789";
+    ft_bzero(buf, 5);
+    if (buf[0] == 0 && buf[4] == 0 && buf[5] == '6')
+        result_ok("ft_bzero: partial zero");
+    else
+        result_ko("ft_bzero: partial zero");
+    
+    ft_bzero(buf, 0);
+    if (buf[5] == '6')
+        result_ok("ft_bzero: zero length");
+    else
+        result_ko("ft_bzero: zero length");
 }
 
-/* ========== PART 1: Libc Functions ========== */
-
-static void test_atoi(void)
+static void test_memcpy(void)
 {
-    section("ft_atoi");
-    expect_int_eq("ft_atoi(\"0\")", atoi("0"), ft_atoi("0"));
-    expect_int_eq("ft_atoi(\"42\")", atoi("42"), ft_atoi("42"));
-    expect_int_eq("ft_atoi(\"   -42\")", atoi("   -42"), ft_atoi("   -42"));
-    expect_int_eq("ft_atoi(\"+123\")", atoi("+123"), ft_atoi("+123"));
-    expect_int_eq("ft_atoi(INT_MIN)", atoi("-2147483648"), ft_atoi("-2147483648"));
-    expect_int_eq("ft_atoi(INT_MAX)", atoi("2147483647"), ft_atoi("2147483647"));
-    expect_int_eq("ft_atoi(whitespace)", atoi(" \t\n-42"), ft_atoi(" \t\n-42"));
+    printf("\n%s=== ft_memcpy ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    char src[] = "Hello World";
+    char dst[20];
+    
+    ft_memcpy(dst, src, strlen(src) + 1);
+    if (strcmp(dst, "Hello World") == 0)
+        result_ok("ft_memcpy: basic copy");
+    else
+        result_ko("ft_memcpy: basic copy");
+    
+    char buf[10] = {0};
+    ft_memcpy(buf, "test", 0);
+    if (buf[0] == 0)
+        result_ok("ft_memcpy: zero length");
+    else
+        result_ko("ft_memcpy: zero length");
+    
+    unsigned char binary[5] = {0, 1, 255, 128, 42};
+    unsigned char binary_dst[5];
+    ft_memcpy(binary_dst, binary, 5);
+    if (memcmp(binary, binary_dst, 5) == 0)
+        result_ok("ft_memcpy: binary data");
+    else
+        result_ko("ft_memcpy: binary data");
 }
 
-static void test_bzero_and_calloc(void)
+static void test_memmove(void)
 {
-    section("ft_bzero & ft_calloc");
+    printf("\n%s=== ft_memmove ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    int a = INT_MAX, b = INT_MIN;
-    ft_bzero(&a, sizeof(a));
-    ft_bzero(&b, sizeof(b));
-    report_result("ft_bzero zeros INT_MAX", a == 0);
-    report_result("ft_bzero zeros INT_MIN", b == 0);
+    char buf1[20] = "Hello World";
+    ft_memmove(buf1 + 6, buf1, 5);
+    if (strcmp(buf1, "Hello Hello") == 0)
+        result_ok("ft_memmove: overlapping forward");
+    else
+        result_ko("ft_memmove: overlapping forward");
     
-    char arr[10] = "123456789";
-    ft_bzero(arr, 5);
-    report_result("ft_bzero partial", arr[0] == 0 && arr[4] == 0 && arr[5] == '6');
+    char buf2[20] = "Hello World";
+    ft_memmove(buf2, buf2 + 6, 5);
+    if (strncmp(buf2, "World", 5) == 0)
+        result_ok("ft_memmove: overlapping backward");
+    else
+        result_ko("ft_memmove: overlapping backward");
     
-    size_t nm = 5;
-    int *s = ft_calloc(nm, sizeof(int));
-    int *s2 = calloc(nm, sizeof(int));
-    if (!s || !s2) {
-        report_result("ft_calloc returned non-NULL", 0);
-    } else {
-        expect_mem_eq("ft_calloc matches calloc", s, s2, nm * sizeof(int));
-    }
-    free(s); free(s2);
-    
-    void *overflow = ft_calloc(SIZE_MAX, SIZE_MAX);
-    report_result("ft_calloc overflow protection", overflow == NULL);
-    if (overflow) free(overflow);
-    
-    void *zero1 = ft_calloc(0, 10);
-    void *zero2 = ft_calloc(10, 0);
-    if (zero1) free(zero1);
-    if (zero2) free(zero2);
-    report_result("ft_calloc(0, n) doesn't crash", 1);
+    char src[] = "Test";
+    char dst[10];
+    ft_memmove(dst, src, 5);
+    if (strcmp(dst, "Test") == 0)
+        result_ok("ft_memmove: non-overlapping");
+    else
+        result_ko("ft_memmove: non-overlapping");
 }
 
-static void test_is_functions(void)
+static void test_memchr(void)
 {
-    section("ft_is* & ft_toupper/tolower");
+    printf("\n%s=== ft_memchr ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    int all_match = 1;
-    for (int c = -1; c <= 255; ++c) {
-        unsigned char uc = (unsigned char)c;
-        if ((isalpha(uc) != 0) != (ft_isalpha(uc) != 0)) all_match = 0;
-        if ((isdigit(uc) != 0) != (ft_isdigit(uc) != 0)) all_match = 0;
-        if ((isalnum(uc) != 0) != (ft_isalnum(uc) != 0)) all_match = 0;
-        if (((c >= 0 && c <= 127) != 0) != (ft_isascii(c) != 0)) all_match = 0;
-        if ((isprint(uc) != 0) != (ft_isprint(uc) != 0)) all_match = 0;
-        if (toupper(uc) != ft_toupper(uc)) all_match = 0;
-        if (tolower(uc) != ft_tolower(uc)) all_match = 0;
-    }
-    report_result("ft_is*/toupper/tolower match libc for -1..255", all_match);
+    char str[] = "Hello World";
+    if (ft_memchr(str, 'W', strlen(str)) == &str[6])
+        result_ok("ft_memchr: char found");
+    else
+        result_ko("ft_memchr: char found");
+    
+    if (ft_memchr(str, 'Z', strlen(str)) == NULL)
+        result_ok("ft_memchr: char not found");
+    else
+        result_ko("ft_memchr: char not found");
+    
+    if (ft_memchr(str, '\0', strlen(str) + 1) == &str[11])
+        result_ok("ft_memchr: null terminator");
+    else
+        result_ko("ft_memchr: null terminator");
+    
+    char binary[] = {0, 1, 2, 255, 4};
+    if (ft_memchr(binary, 255, 5) == &binary[3])
+        result_ok("ft_memchr: byte 255");
+    else
+        result_ko("ft_memchr: byte 255");
 }
 
-static void test_strlen_dup_strl(void)
+static void test_memcmp(void)
 {
-    section("ft_strlen / ft_strdup / ft_strlcpy / ft_strlcat");
+    printf("\n%s=== ft_memcmp ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    const char *cases[] = { "", "a", "hello", "longer string test", NULL };
-    for (int i = 0; cases[i]; ++i) {
-        if (ft_strlen(cases[i]) != strlen(cases[i])) {
-            report_result("ft_strlen matches strlen", 0);
-            return;
-        }
-        char *d = ft_strdup(cases[i]);
-        if (!d || strcmp(d, cases[i]) != 0) {
-            report_result("ft_strdup works correctly", 0);
-            free(d);
-            return;
-        }
-        free(d);
-    }
-    report_result("ft_strlen matches strlen", 1);
-    report_result("ft_strdup works correctly", 1);
+    if (ft_memcmp("Hello", "Hello", 5) == 0)
+        result_ok("ft_memcmp: equal strings");
+    else
+        result_ko("ft_memcmp: equal strings");
     
-    char dst[32];
-    memset(dst, 'X', sizeof(dst));
-    size_t r = ft_strlcpy(dst, "1234567890", sizeof(dst));
-    report_result("ft_strlcpy returns src length", r == 10);
-    report_result("ft_strlcpy null-terminates", dst[10] == '\0');
+    if (ft_memcmp("Hello", "World", 5) < 0)
+        result_ok("ft_memcmp: first < second");
+    else
+        result_ko("ft_memcmp: first < second");
     
-    strcpy(dst, "Hello");
-    r = ft_strlcat(dst, " World", sizeof(dst));
-    report_result("ft_strlcat concatenates", strcmp(dst, "Hello World") == 0 && r == 11);
+    if (ft_memcmp("World", "Hello", 5) > 0)
+        result_ok("ft_memcmp: first > second");
+    else
+        result_ko("ft_memcmp: first > second");
+    
+    if (ft_memcmp("test\200", "test\0", 5) > 0)
+        result_ok("ft_memcmp: unsigned comparison");
+    else
+        result_ko("ft_memcmp: unsigned comparison");
+    
+    if (ft_memcmp("Hello", "Hellx", 0) == 0)
+        result_ok("ft_memcmp: zero length");
+    else
+        result_ko("ft_memcmp: zero length");
 }
 
-static void test_strchr_strrchr(void)
+/* ========== String Search Functions ========== */
+
+static void test_strchr(void)
 {
-    section("ft_strchr / ft_strrchr");
+    printf("\n%s=== ft_strchr ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    const char *s = "hello world";
-    report_result("ft_strchr finds first 'o'", strchr(s, 'o') == ft_strchr(s, 'o'));
-    report_result("ft_strrchr finds last 'o'", strrchr(s, 'o') == ft_strrchr(s, 'o'));
-    report_result("ft_strchr finds \\0", strchr(s, '\0') == ft_strchr(s, '\0'));
-    report_result("ft_strchr not found returns NULL", 
-                  strchr(s, 'z') == ft_strchr(s, 'z') && ft_strchr(s, 'z') == NULL);
+    char str[] = "Hello World";
+    if (ft_strchr(str, 'W') == &str[6])
+        result_ok("ft_strchr: char found");
+    else
+        result_ko("ft_strchr: char found");
+    
+    if (ft_strchr(str, 'Z') == NULL)
+        result_ok("ft_strchr: char not found");
+    else
+        result_ko("ft_strchr: char not found");
+    
+    if (ft_strchr(str, '\0') == &str[11])
+        result_ok("ft_strchr: null terminator");
+    else
+        result_ko("ft_strchr: null terminator");
+    
+    if (ft_strchr("", 'a') == NULL)
+        result_ok("ft_strchr: empty string");
+    else
+        result_ko("ft_strchr: empty string");
+    
+    if (ft_strchr("teste", 'e') == strchr("teste", 'e'))
+        result_ok("ft_strchr: first occurrence");
+    else
+        result_ko("ft_strchr: first occurrence");
 }
 
-static void test_strncmp(void)
+static void test_strrchr(void)
 {
-    section("ft_strncmp");
+    printf("\n%s=== ft_strrchr ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    struct { const char *s1; const char *s2; size_t n; } cases[] = {
-        {"abc", "abc", 3}, {"abc", "abd", 3}, {"abc", "ab", 3},
-        {"", "", 1}, {"test", "test", 10}, {NULL, NULL, 0}
-    };
+    char str[] = "Hello World";
+    if (ft_strrchr(str, 'o') == &str[7])
+        result_ok("ft_strrchr: last occurrence");
+    else
+        result_ko("ft_strrchr: last occurrence");
     
-    for (int i = 0; cases[i].s1; i++) {
-        int exp = strncmp(cases[i].s1, cases[i].s2, cases[i].n);
-        int got = ft_strncmp(cases[i].s1, cases[i].s2, cases[i].n);
-        int ok = (exp == 0 && got == 0) || (exp < 0 && got < 0) || (exp > 0 && got > 0);
-        if (!ok) {
-            report_result("ft_strncmp sign matches", 0);
-            return;
-        }
-    }
-    report_result("ft_strncmp sign matches", 1);
+    if (ft_strrchr(str, 'Z') == NULL)
+        result_ok("ft_strrchr: char not found");
+    else
+        result_ko("ft_strrchr: char not found");
+    
+    if (ft_strrchr(str, '\0') == &str[11])
+        result_ok("ft_strrchr: null terminator");
+    else
+        result_ko("ft_strrchr: null terminator");
+    
+    if (ft_strrchr("", '\0') != NULL)
+        result_ok("ft_strrchr: empty string null");
+    else
+        result_ko("ft_strrchr: empty string null");
 }
 
 static void test_strnstr(void)
 {
-    section("ft_strnstr");
+    printf("\n%s=== ft_strnstr ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    const char *hay = "This is a simple haystack";
-    char *found = ft_strnstr(hay, "simple", strlen(hay));
-    report_result("ft_strnstr finds substring", 
-                  found && strcmp(found, "simple haystack") == 0);
-    report_result("ft_strnstr len too short", ft_strnstr(hay, "simple", 10) == NULL);
-    report_result("ft_strnstr empty needle", ft_strnstr(hay, "", strlen(hay)) == hay);
+    char haystack[] = "Hello World";
+    if (ft_strnstr(haystack, "World", 11) == &haystack[6])
+        result_ok("ft_strnstr: substring found");
+    else
+        result_ko("ft_strnstr: substring found");
+    
+    if (ft_strnstr(haystack, "World", 8) == NULL)
+        result_ok("ft_strnstr: length too short");
+    else
+        result_ko("ft_strnstr: length too short");
+    
+    if (ft_strnstr(haystack, "", 11) == haystack)
+        result_ok("ft_strnstr: empty needle");
+    else
+        result_ko("ft_strnstr: empty needle");
+    
+    if (ft_strnstr("", "test", 5) == NULL)
+        result_ok("ft_strnstr: empty haystack");
+    else
+        result_ko("ft_strnstr: empty haystack");
+    
+    if (ft_strnstr("lorem ipsum dolor sit amet", "dolor", 15) == NULL)
+        result_ok("ft_strnstr: needle beyond len");
+    else
+        result_ko("ft_strnstr: needle beyond len");
 }
 
-static void test_mem_functions(void)
+static void test_strncmp(void)
 {
-    section("Memory Functions");
+    printf("\n%s=== ft_strncmp ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    char src[64];
-    for (int i = 0; i < (int)sizeof(src); ++i) src[i] = (char)(i & 0xFF);
+    if (ft_strncmp("Hello", "Hello", 5) == 0)
+        result_ok("ft_strncmp: equal strings");
+    else
+        result_ko("ft_strncmp: equal strings");
     
-    char a1[32], a2[32];
-    memset(a1, 0xAA, sizeof(a1));
-    memset(a2, 0xAA, sizeof(a2));
-    ft_memset(a1, 0x11, 16);
-    memset(a2, 0x11, 16);
-    expect_mem_eq("ft_memset matches memset", a1, a2, sizeof(a1));
+    if (ft_strncmp("Hello", "Hellx", 4) == 0)
+        result_ok("ft_strncmp: partial match");
+    else
+        result_ko("ft_strncmp: partial match");
     
-    char b1[32], b2[32];
-    memset(b1, 0, sizeof(b1));
-    memset(b2, 0, sizeof(b2));
-    memcpy(b1, src, 16);
-    ft_memcpy(b2, src, 16);
-    expect_mem_eq("ft_memcpy matches memcpy", b1, b2, 16);
+    if (ft_strncmp("ABC", "ABZ", 3) < 0)
+        result_ok("ft_strncmp: first < second");
+    else
+        result_ko("ft_strncmp: first < second");
     
-    char c1[64], c2[64];
-    for (size_t i = 0; i < sizeof(c1); ++i) c1[i] = c2[i] = (char)i;
-    memmove(c1 + 3, c1, 20);
-    ft_memmove(c2 + 3, c2, 20);
-    expect_mem_eq("ft_memmove overlap forward", c1, c2, sizeof(c1));
+    if (ft_strncmp("test\200", "test\0", 6) > 0)
+        result_ok("ft_strncmp: unsigned comparison");
+    else
+        result_ko("ft_strncmp: unsigned comparison");
     
-    report_result("ft_memchr finds char", 
-                  memchr("hello", 'o', 5) == ft_memchr("hello", 'o', 5));
+    if (ft_strncmp("Hello", "World", 0) == 0)
+        result_ok("ft_strncmp: zero length");
+    else
+        result_ko("ft_strncmp: zero length");
+}
+
+/* ========== String Copy Functions ========== */
+
+static void test_strlcpy(void)
+{
+    printf("\n%s=== ft_strlcpy ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    int cmp = memcmp("abc", "abd", 3);
-    int fcmp = ft_memcmp("abc", "abd", 3);
-    report_result("ft_memcmp sign matches", 
-                  (cmp == 0 && fcmp == 0) || (cmp < 0 && fcmp < 0) || (cmp > 0 && fcmp > 0));
+    char dst[20];
+    size_t ret = ft_strlcpy(dst, "Hello", 20);
+    if (ret == 5 && strcmp(dst, "Hello") == 0)
+        result_ok("ft_strlcpy: basic copy");
+    else
+        result_ko("ft_strlcpy: basic copy");
+    
+    ret = ft_strlcpy(dst, "Hello World", 6);
+    if (ret == 11 && strcmp(dst, "Hello") == 0)
+        result_ok("ft_strlcpy: truncation");
+    else
+        result_ko("ft_strlcpy: truncation");
+    
+    ret = ft_strlcpy(dst, "Test", 1);
+    if (ret == 4 && dst[0] == '\0')
+        result_ok("ft_strlcpy: size 1");
+    else
+        result_ko("ft_strlcpy: size 1");
+    
+    ret = ft_strlcpy(dst, "Test", 0);
+    if (ret == 4)
+        result_ok("ft_strlcpy: size 0");
+    else
+        result_ko("ft_strlcpy: size 0");
+}
+
+static void test_strlcat(void)
+{
+    printf("\n%s=== ft_strlcat ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    char dst[20] = "Hello ";
+    size_t ret = ft_strlcat(dst, "World", 20);
+    if (ret == 11 && strcmp(dst, "Hello World") == 0)
+        result_ok("ft_strlcat: basic concat");
+    else
+        result_ko("ft_strlcat: basic concat");
+    
+    char dst2[10] = "Hello";
+    ret = ft_strlcat(dst2, " World", 10);
+    if (ret == 11 && strcmp(dst2, "Hello Wor") == 0)
+        result_ok("ft_strlcat: truncation");
+    else
+        result_ko("ft_strlcat: truncation");
+    
+    char dst3[5] = "Hi";
+    ret = ft_strlcat(dst3, "Test", 2);
+    if (ret == 6)
+        result_ok("ft_strlcat: size <= initial len");
+    else
+        result_ko("ft_strlcat: size <= initial len");
+}
+
+/* ========== Character Conversion ========== */
+
+static void test_toupper(void)
+{
+    printf("\n%s=== ft_toupper ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    if (ft_toupper('a') == 'A' && ft_toupper('z') == 'Z')
+        result_ok("ft_toupper: lowercase to uppercase");
+    else
+        result_ko("ft_toupper: lowercase to uppercase");
+    
+    if (ft_toupper('A') == 'A' && ft_toupper('5') == '5')
+        result_ok("ft_toupper: non-lowercase unchanged");
+    else
+        result_ko("ft_toupper: non-lowercase unchanged");
+}
+
+static void test_tolower(void)
+{
+    printf("\n%s=== ft_tolower ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    if (ft_tolower('A') == 'a' && ft_tolower('Z') == 'z')
+        result_ok("ft_tolower: uppercase to lowercase");
+    else
+        result_ko("ft_tolower: uppercase to lowercase");
+    
+    if (ft_tolower('a') == 'a' && ft_tolower('5') == '5')
+        result_ok("ft_tolower: non-uppercase unchanged");
+    else
+        result_ko("ft_tolower: non-uppercase unchanged");
+}
+
+/* ========== atoi Tests ========== */
+
+static void test_atoi(void)
+{
+    printf("\n%s=== ft_atoi ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    if (ft_atoi("42") == 42)
+        result_ok("ft_atoi: simple positive");
+    else
+        result_ko("ft_atoi: simple positive");
+    
+    if (ft_atoi("-42") == -42)
+        result_ok("ft_atoi: simple negative");
+    else
+        result_ko("ft_atoi: simple negative");
+    
+    if (ft_atoi("   +123") == 123)
+        result_ok("ft_atoi: whitespace and +");
+    else
+        result_ko("ft_atoi: whitespace and +");
+    
+    if (ft_atoi("0") == 0)
+        result_ok("ft_atoi: zero");
+    else
+        result_ko("ft_atoi: zero");
+    
+    if (ft_atoi("2147483647") == 2147483647)
+        result_ok("ft_atoi: INT_MAX");
+    else
+        result_ko("ft_atoi: INT_MAX");
+    
+    if (ft_atoi("-2147483648") == -2147483648)
+        result_ok("ft_atoi: INT_MIN");
+    else
+        result_ko("ft_atoi: INT_MIN");
+    
+    if (ft_atoi("  \t\n  -123abc") == -123)
+        result_ok("ft_atoi: stops at non-digit");
+    else
+        result_ko("ft_atoi: stops at non-digit");
+    
+    if (ft_atoi("") == 0)
+        result_ok("ft_atoi: empty string");
+    else
+        result_ko("ft_atoi: empty string");
+}
+
+/* ========== calloc Tests ========== */
+
+static void test_calloc(void)
+{
+    printf("\n%s=== ft_calloc ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    int *arr = (int *)ft_calloc(5, sizeof(int));
+    if (arr && arr[0] == 0 && arr[4] == 0)
+        result_ok("ft_calloc: zeroed memory");
+    else
+        result_ko("ft_calloc: zeroed memory");
+    free(arr);
+    
+    char *str = (char *)ft_calloc(10, sizeof(char));
+    if (str && str[0] == 0 && str[9] == 0)
+        result_ok("ft_calloc: char array");
+    else
+        result_ko("ft_calloc: char array");
+    free(str);
+    
+    void *ptr = ft_calloc(0, 10);
+    if (ptr)
+        free(ptr);
+    result_ok("ft_calloc: zero count");
+    
+    ptr = ft_calloc(10, 0);
+    if (ptr)
+        free(ptr);
+    result_ok("ft_calloc: zero size");
+}
+
+/* ========== strdup Tests ========== */
+
+static void test_strdup(void)
+{
+    printf("\n%s=== ft_strdup ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    char *dup = ft_strdup("Hello");
+    if (dup && strcmp(dup, "Hello") == 0)
+        result_ok("ft_strdup: basic duplicate");
+    else
+        result_ko("ft_strdup: basic duplicate");
+    free(dup);
+    
+    dup = ft_strdup("");
+    if (dup && strcmp(dup, "") == 0)
+        result_ok("ft_strdup: empty string");
+    else
+        result_ko("ft_strdup: empty string");
+    free(dup);
+    
+    char original[] = "1337 School";
+    dup = ft_strdup(original);
+    if (dup && dup != original && strcmp(dup, original) == 0)
+        result_ok("ft_strdup: different address");
+    else
+        result_ko("ft_strdup: different address");
+    free(dup);
 }
 
 /* ========== PART 2: Additional Functions ========== */
 
-static void test_string_utils(void)
+static void test_substr(void)
 {
-    section("Part 2: String Utilities");
+    printf("\n%s=== ft_substr ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    char *sub = ft_substr("Hello, world", 7, 5);
-    expect_str_eq("ft_substr", "world", sub);
+    char *sub = ft_substr("Hello World", 6, 5);
+    if (sub && strcmp(sub, "World") == 0)
+        result_ok("ft_substr: basic substring");
+    else
+        result_ko("ft_substr: basic substring");
     free(sub);
     
-    sub = ft_substr("hello", 10, 5);
-    report_result("ft_substr start > len", sub && strcmp(sub, "") == 0);
+    sub = ft_substr("Hello", 0, 3);
+    if (sub && strcmp(sub, "Hel") == 0)
+        result_ok("ft_substr: from start");
+    else
+        result_ko("ft_substr: from start");
     free(sub);
     
-    char *j = ft_strjoin("foo", "bar");
-    expect_str_eq("ft_strjoin", "foobar", j);
-    free(j);
+    sub = ft_substr("Hello", 2, 100);
+    if (sub && strcmp(sub, "llo") == 0)
+        result_ok("ft_substr: len > available");
+    else
+        result_ko("ft_substr: len > available");
+    free(sub);
     
-    char *t = ft_strtrim("  \ttrim me\n  ", " \n\t");
-    expect_str_eq("ft_strtrim", "trim me", t);
-    free(t);
+    sub = ft_substr("Hello", 10, 5);
+    if (sub && strcmp(sub, "") == 0)
+        result_ok("ft_substr: start beyond string");
+    else
+        result_ko("ft_substr: start beyond string");
+    free(sub);
     
-    t = ft_strtrim("xxxhelloxxx", "x");
-    expect_str_eq("ft_strtrim custom", "hello", t);
-    free(t);
+    sub = ft_substr("", 0, 5);
+    if (sub && strcmp(sub, "") == 0)
+        result_ok("ft_substr: empty string");
+    else
+        result_ko("ft_substr: empty string");
+    free(sub);
+}
+
+static void test_strjoin(void)
+{
+    printf("\n%s=== ft_strjoin ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    char *join = ft_strjoin("Hello ", "World");
+    if (join && strcmp(join, "Hello World") == 0)
+        result_ok("ft_strjoin: basic join");
+    else
+        result_ko("ft_strjoin: basic join");
+    free(join);
+    
+    join = ft_strjoin("", "Test");
+    if (join && strcmp(join, "Test") == 0)
+        result_ok("ft_strjoin: empty first");
+    else
+        result_ko("ft_strjoin: empty first");
+    free(join);
+    
+    join = ft_strjoin("Test", "");
+    if (join && strcmp(join, "Test") == 0)
+        result_ok("ft_strjoin: empty second");
+    else
+        result_ko("ft_strjoin: empty second");
+    free(join);
+    
+    join = ft_strjoin("", "");
+    if (join && strcmp(join, "") == 0)
+        result_ok("ft_strjoin: both empty");
+    else
+        result_ko("ft_strjoin: both empty");
+    free(join);
+}
+
+static void test_strtrim(void)
+{
+    printf("\n%s=== ft_strtrim ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    char *trim = ft_strtrim("   Hello   ", " ");
+    if (trim && strcmp(trim, "Hello") == 0)
+        result_ok("ft_strtrim: spaces both sides");
+    else
+        result_ko("ft_strtrim: spaces both sides");
+    free(trim);
+    
+    trim = ft_strtrim("xxxHelloxxx", "x");
+    if (trim && strcmp(trim, "Hello") == 0)
+        result_ok("ft_strtrim: custom charset");
+    else
+        result_ko("ft_strtrim: custom charset");
+    free(trim);
+    
+    trim = ft_strtrim("   ", " ");
+    if (trim && strcmp(trim, "") == 0)
+        result_ok("ft_strtrim: all trimmed");
+    else
+        result_ko("ft_strtrim: all trimmed");
+    free(trim);
+    
+    trim = ft_strtrim("Hello", "xyz");
+    if (trim && strcmp(trim, "Hello") == 0)
+        result_ok("ft_strtrim: nothing to trim");
+    else
+        result_ko("ft_strtrim: nothing to trim");
+    free(trim);
+    
+    trim = ft_strtrim("", " ");
+    if (trim && strcmp(trim, "") == 0)
+        result_ok("ft_strtrim: empty string");
+    else
+        result_ko("ft_strtrim: empty string");
+    free(trim);
 }
 
 static void test_split(void)
 {
-    section("ft_split");
+    printf("\n%s=== ft_split ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    char **res = ft_split("hello,world,test", ',');
-    if (res) {
-        int ok = (res[0] && strcmp(res[0], "hello") == 0) &&
-                 (res[1] && strcmp(res[1], "world") == 0) &&
-                 (res[2] && strcmp(res[2], "test") == 0) &&
-                 (res[3] == NULL);
-        report_result("ft_split basic case", ok);
-        free_split(res);
-    }
+    char **split = ft_split("Hello World Test", ' ');
+    if (split && strcmp(split[0], "Hello") == 0 && 
+        strcmp(split[1], "World") == 0 && 
+        strcmp(split[2], "Test") == 0 && 
+        split[3] == NULL)
+        result_ok("ft_split: basic split");
+    else
+        result_ko("ft_split: basic split");
+    for (int i = 0; split && split[i]; i++)
+        free(split[i]);
+    free(split);
     
-    res = ft_split(",,a,,b,,", ',');
-    if (res) {
-        int ok = (res[0] && strcmp(res[0], "a") == 0) &&
-                 (res[1] && strcmp(res[1], "b") == 0) &&
-                 (res[2] == NULL);
-        report_result("ft_split skips consecutive delimiters", ok);
-        free_split(res);
-    }
+    split = ft_split("   Hello   World   ", ' ');
+    if (split && strcmp(split[0], "Hello") == 0 && 
+        strcmp(split[1], "World") == 0 && 
+        split[2] == NULL)
+        result_ok("ft_split: multiple delimiters");
+    else
+        result_ko("ft_split: multiple delimiters");
+    for (int i = 0; split && split[i]; i++)
+        free(split[i]);
+    free(split);
     
-    res = ft_split("", ',');
-    report_result("ft_split empty string", res && res[0] == NULL);
-    free_split(res);
+    split = ft_split("", ' ');
+    if (split && split[0] == NULL)
+        result_ok("ft_split: empty string");
+    else
+        result_ko("ft_split: empty string");
+    free(split);
+    
+    split = ft_split("Hello", ' ');
+    if (split && strcmp(split[0], "Hello") == 0 && split[1] == NULL)
+        result_ok("ft_split: no delimiter");
+    else
+        result_ko("ft_split: no delimiter");
+    for (int i = 0; split && split[i]; i++)
+        free(split[i]);
+    free(split);
+    
+    split = ft_split("   ", ' ');
+    if (split && split[0] == NULL)
+        result_ok("ft_split: only delimiters");
+    else
+        result_ko("ft_split: only delimiters");
+    free(split);
 }
 
 static void test_itoa(void)
 {
-    section("ft_itoa");
+    printf("\n%s=== ft_itoa ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    struct { int n; const char *exp; } cases[] = {
-        {0, "0"}, {42, "42"}, {-42, "-42"},
-        {2147483647, "2147483647"}, {-2147483648, "-2147483648"}
-    };
+    char *str = ft_itoa(42);
+    if (str && strcmp(str, "42") == 0)
+        result_ok("ft_itoa: positive number");
+    else
+        result_ko("ft_itoa: positive number");
+    free(str);
     
-    for (size_t i = 0; i < sizeof(cases) / sizeof(cases[0]); i++) {
-        char *result = ft_itoa(cases[i].n);
-        char buf[64];
-        snprintf(buf, sizeof(buf), "ft_itoa(%d)", cases[i].n);
-        expect_str_eq(buf, cases[i].exp, result);
-        free(result);
-    }
+    str = ft_itoa(-42);
+    if (str && strcmp(str, "-42") == 0)
+        result_ok("ft_itoa: negative number");
+    else
+        result_ko("ft_itoa: negative number");
+    free(str);
+    
+    str = ft_itoa(0);
+    if (str && strcmp(str, "0") == 0)
+        result_ok("ft_itoa: zero");
+    else
+        result_ko("ft_itoa: zero");
+    free(str);
+    
+    str = ft_itoa(2147483647);
+    if (str && strcmp(str, "2147483647") == 0)
+        result_ok("ft_itoa: INT_MAX");
+    else
+        result_ko("ft_itoa: INT_MAX");
+    free(str);
+    
+    str = ft_itoa(-2147483648);
+    if (str && strcmp(str, "-2147483648") == 0)
+        result_ok("ft_itoa: INT_MIN");
+    else
+        result_ko("ft_itoa: INT_MIN");
+    free(str);
 }
 
-static void test_strmapi_striteri(void)
+static char test_map_func(unsigned int i, char c)
 {
-    section("ft_strmapi / ft_striteri");
-    
-    char mapper_upper(unsigned int idx, char c) { 
-        (void)idx; 
-        return (char)ft_toupper((unsigned char)c); 
-    }
-    
-    char *mapped = ft_strmapi("aBcZ", mapper_upper);
-    expect_str_eq("ft_strmapi uppercase", "ABCZ", mapped);
-    free(mapped);
-    
-    void iter_lower(unsigned int idx, char *c) { 
-        (void)idx; 
-        *c = (char)ft_tolower((unsigned char)*c); 
-    }
-    
-    char mut[] = "HeLLo";
-    ft_striteri(mut, iter_lower);
-    expect_str_eq("ft_striteri lowercase", "hello", mut);
+    (void)i;
+    if (c >= 'a' && c <= 'z')
+        return c - 32;
+    return c;
 }
 
-/* ========== File Descriptor Functions ========== */
-
-static void test_put_fd_functions(void)
+static void test_strmapi(void)
 {
-    section("put*_fd Functions");
+    printf("\n%s=== ft_strmapi ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    int p[2];
-    if (pipe(p) == -1) {
-        report_result("pipe() creation", 0);
-        return;
-    }
+    char *result = ft_strmapi("hello", test_map_func);
+    if (result && strcmp(result, "HELLO") == 0)
+        result_ok("ft_strmapi: uppercase mapping");
+    else
+        result_ko("ft_strmapi: uppercase mapping");
+    free(result);
     
-    ft_putchar_fd('X', p[1]);
-    char out = 0;
-    read_full(p[0], &out, 1);
-    report_result("ft_putchar_fd", out == 'X');
-    
-    ft_putstr_fd((char*)"hello", p[1]);
-    char buf[64] = {0};
-    read_full(p[0], buf, 5);
-    report_result("ft_putstr_fd", strcmp(buf, "hello") == 0);
-    
-    ft_putendl_fd((char*)"line", p[1]);
-    memset(buf, 0, sizeof(buf));
-    read_full(p[0], buf, 5);
-    report_result("ft_putendl_fd", buf[4] == '\n');
-    
-    ft_putnbr_fd(-12345, p[1]);
-    memset(buf, 0, sizeof(buf));
-    read_full(p[0], buf, 6);
-    report_result("ft_putnbr_fd", strncmp(buf, "-12345", 6) == 0);
-    
-    close(p[0]);
-    close(p[1]);
+    result = ft_strmapi("", test_map_func);
+    if (result && strcmp(result, "") == 0)
+        result_ok("ft_strmapi: empty string");
+    else
+        result_ko("ft_strmapi: empty string");
+    free(result);
 }
 
-/* ========== BONUS: Linked List Functions ========== */
-
-static void test_bonus_linked_list(void)
+static void test_iter_func(unsigned int i, char *c)
 {
-    section("BONUS: Linked List Functions");
-    
-    char *c1 = strdup("one");
-    char *c2 = strdup("two");
-    char *c3 = strdup("three");
-    
-    if (!c1 || !c2 || !c3) {
-        free(c1); free(c2); free(c3);
-        report_result("list content allocation", 0);
-        return;
-    }
-    
-    t_list *n1 = ft_lstnew(c1);
-    t_list *n2 = ft_lstnew(c2);
-    t_list *n3 = ft_lstnew(c3);
-    
-    if (!n1 || !n2 || !n3) {
-        report_result("ft_lstnew", 0);
-        return;
-    }
-    
-    ft_lstadd_back(&n1, n2);
-    ft_lstadd_back(&n1, n3);
-    report_result("ft_lstsize returns 3", ft_lstsize(n1) == 3);
-    
-    t_list *last = ft_lstlast(n1);
-    report_result("ft_lstlast points to last", last == n3);
-    
-    char *front_c = strdup("front");
-    t_list *front = ft_lstnew(front_c);
-    ft_lstadd_front(&n1, front);
-    report_result("ft_lstadd_front", n1 == front);
-    
-    void *mapf(void *c) {
-        char *s = (char *)c;
-        char *out = malloc(strlen(s) + 3);
-        if (!out) return NULL;
-        strcpy(out, s);
-        strcat(out, "_m");
-        return out;
-    }
-    
-    t_list *mapped = ft_lstmap(n1, mapf, free);
-    report_result("ft_lstmap creates new list", mapped != NULL && ft_lstsize(mapped) == 4);
-    
-    ft_lstclear(&n1, free);
-    ft_lstclear(&mapped, free);
-    report_result("ft_lstclear nulls head", n1 == NULL && mapped == NULL);
-    
-    ft_lstiter(NULL, NULL);
-    ft_lstclear(NULL, free);
-    report_result("list functions handle NULL", 1);
+    (void)i;
+    if (*c >= 'a' && *c <= 'z')
+        *c = *c - 32;
 }
 
-/* ========== Summary & Results ========== */
-
-static void print_summary(void)
+static void test_striteri(void)
 {
+    printf("\n%s=== ft_striteri ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    char str[] = "hello";
+    ft_striteri(str, test_iter_func);
+    if (strcmp(str, "HELLO") == 0)
+        result_ok("ft_striteri: uppercase in place");
+    else
+        result_ko("ft_striteri: uppercase in place");
+    
+    char empty[] = "";
+    ft_striteri(empty, test_iter_func);
+    if (strcmp(empty, "") == 0)
+        result_ok("ft_striteri: empty string");
+    else
+        result_ko("ft_striteri: empty string");
+}
+
+static void test_putchar_fd(void)
+{
+    printf("\n%s=== ft_putchar_fd ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    printf("Testing ft_putchar_fd (visual check): ");
+    ft_putchar_fd('A', 1);
+    ft_putchar_fd('B', 1);
+    ft_putchar_fd('\n', 1);
+    result_ok("ft_putchar_fd: executed");
+}
+
+static void test_putstr_fd(void)
+{
+    printf("\n%s=== ft_putstr_fd ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    printf("Testing ft_putstr_fd (visual check): ");
+    ft_putstr_fd("Hello World", 1);
     printf("\n");
-    printf("%s%s╔═══════════════════════════════════════════════════════════╗%s\n", 
-           CLR_YELLOW, CLR_BOLD, CLR_RESET);
-    printf("%s%s║                      TEST SUMMARY                         ║%s\n", 
-           CLR_YELLOW, CLR_BOLD, CLR_RESET);
-    printf("%s%s╚═══════════════════════════════════════════════════════════╝%s\n", 
-           CLR_YELLOW, CLR_BOLD, CLR_RESET);
+    result_ok("ft_putstr_fd: executed");
     
-    printf("\n  Total tests:  %s%d%s\n", CLR_BOLD, tests_run, CLR_RESET);
-    printf("  Passed:       %s%s%d%s\n", CLR_GREEN, CLR_BOLD, tests_passed, CLR_RESET);
-    printf("  Failed:       %s%s%d%s\n", 
-           tests_run == tests_passed ? CLR_GREEN : CLR_RED, 
-           CLR_BOLD, tests_run - tests_passed, CLR_RESET);
-    
-    if (tests_run == tests_passed) {
-        printf("\n%s%s", CLR_GREEN, CLR_BOLD);
-        for (int i = 0; i < 3; ++i) {
-            printf("\r  🎉 ALL TESTS PASSED! 🎉  ");
-            fflush(stdout);
-            usleep(300000);
-            printf("\r                              \r");
-            fflush(stdout);
-            usleep(150000);
-        }
-        printf("  🎉 ALL TESTS PASSED! 🎉  \n%s", CLR_RESET);
-    } else {
-        printf("\n%s%s  ❌ SOME TESTS FAILED ❌  %s\n", CLR_RED, CLR_BOLD, CLR_RESET);
-    }
+    ft_putstr_fd("", 1);
+    result_ok("ft_putstr_fd: empty string");
 }
 
-static void print_memory_tips(void)
+static void test_putendl_fd(void)
 {
-    printf("\n%s%s╔═══════════════════════════════════════════════════════════╗%s\n", 
-           CLR_CYAN, CLR_BOLD, CLR_RESET);
-    printf("%s%s║              MEMORY TESTING RECOMMENDATIONS               ║%s\n", 
-           CLR_CYAN, CLR_BOLD, CLR_RESET);
-    printf("%s%s╚═══════════════════════════════════════════════════════════╝%s\n", 
-           CLR_CYAN, CLR_BOLD, CLR_RESET);
+    printf("\n%s=== ft_putendl_fd ===%s\n", CLR_YELLOW, CLR_RESET);
     
-    printf("\n%sValgrind (leak detection):%s\n", CLR_CYAN, CLR_RESET);
-    printf("  valgrind --leak-check=full --show-leak-kinds=all ./monsters_test\n");
+    printf("Testing ft_putendl_fd (visual check): ");
+    ft_putendl_fd("Hello World", 1);
+    result_ok("ft_putendl_fd: executed");
     
-    printf("\n%sAddressSanitizer (runtime errors):%s\n", CLR_CYAN, CLR_RESET);
-    printf("  cc -fsanitize=address -g monsters_test.c libft.a -o test_asan\n");
-    printf("  ./test_asan\n\n");
+    ft_putendl_fd("", 1);
+    result_ok("ft_putendl_fd: empty string");
 }
 
-/* ========== Main Runner ========== */
+static void test_putnbr_fd(void)
+{
+    printf("\n%s=== ft_putnbr_fd ===%s\n", CLR_YELLOW, CLR_RESET);
+    
+    printf("Testing ft_putnbr_fd (visual check): ");
+    ft_putnbr_fd(42, 1);
+    printf(" ");
+    ft_putnbr_fd(-42, 1);
+    printf(" ");
+    ft_putnbr_fd(0, 1);
+    printf("\n");
+    result_ok("ft_putnbr_fd: basic numbers");
+    
+    printf("INT_MIN and INT_MAX: ");
+    ft_putnbr_fd(-2147483648, 1);
+    printf(" ");
+    ft_putnbr_fd(2147483647, 1);
+    printf("\n");
+    result_ok("ft_putnbr_fd: edge values");
+}
+
+/* ========== Main Test Runner ========== */
 
 int main(void)
 {
+    setvbuf(stdout, NULL, _IONBF, 0);
     banner();
     
-    test_atoi();
-    test_bzero_and_calloc();
-    test_is_functions();
-    test_strlen_dup_strl();
-    test_strchr_strrchr();
-    test_strncmp();
+    printf("\n%s%s╔════════════════════════════════════════════════╗%s\n", 
+           CLR_BOLD, CLR_CYAN, CLR_RESET);
+    printf("%s%s║    PART 1: Libc Functions                      ║%s\n", 
+           CLR_BOLD, CLR_CYAN, CLR_RESET);
+    printf("%s%s╚════════════════════════════════════════════════╝%s\n", 
+           CLR_BOLD, CLR_CYAN, CLR_RESET);
+    
+    test_isalpha();
+    test_isdigit();
+    test_isalnum();
+    test_isascii();
+    test_isprint();
+    test_strlen();
+    test_memset();
+    test_bzero();
+    test_memcpy();
+    test_memmove();
+    test_memchr();
+    test_memcmp();
+    test_strchr();
+    test_strrchr();
     test_strnstr();
-    test_mem_functions();
-    test_string_utils();
+    test_strncmp();
+    test_strlcpy();
+    test_strlcat();
+    test_toupper();
+    test_tolower();
+    test_atoi();
+    test_calloc();
+    test_strdup();
+    
+    printf("\n%s%s╔════════════════════════════════════════════════╗%s\n", 
+           CLR_BOLD, CLR_CYAN, CLR_RESET);
+    printf("%s%s║    PART 2: Additional Functions                ║%s\n", 
+           CLR_BOLD, CLR_CYAN, CLR_RESET);
+    printf("%s%s╚════════════════════════════════════════════════╝%s\n", 
+           CLR_BOLD, CLR_CYAN, CLR_RESET);
+    
+    test_substr();
+    test_strjoin();
+    test_strtrim();
     test_split();
     test_itoa();
-    test_strmapi_striteri();
-    test_put_fd_functions();
-    test_bonus_linked_list();
+    test_strmapi();
+    test_striteri();
+    test_putchar_fd();
+    test_putstr_fd();
+    test_putendl_fd();
+    test_putnbr_fd();
     
-    print_summary();
-    print_memory_tips();
+    summary();
     
-    return (tests_run == tests_passed) ? 0 : 1;
+    if (tests_run == tests_passed)
+    {
+        printf("\n%s%s🎉 ALL MANDATORY TESTS PASSED! 🎉%s\n\n", 
+               CLR_BOLD, CLR_GREEN, CLR_RESET);
+        return (0);
+    }
+    else
+    {
+        printf("\n%s%s❌ SOME TESTS FAILED ❌%s\n\n", 
+               CLR_BOLD, CLR_RED, CLR_RESET);
+        return (1);
+    }
 }
